@@ -1,4 +1,4 @@
 @echo off
 
-set "CC=g++"
+set CC=g++
 run.cmd

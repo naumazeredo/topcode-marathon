@@ -1,4 +1,4 @@
 @echo off
 
-set "CC=cl"
-run.cmd
+set CC=cl
+run.cmd %*

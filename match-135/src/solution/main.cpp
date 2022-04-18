@@ -1,9 +1,15 @@
 #include <iostream>
 #include <vector>
 #include <string>
+
+#include "common/state.h"
+#include "common/stats.h"
+
 using namespace std;
 
 int main() {
+  Stats stats;
+
   int N, C;
   cin >> N >> C;
 
@@ -25,14 +31,16 @@ int main() {
     }
   }
 
-  cerr << "test err!" << endl;
+  State state;
+
+  stats.log(state);
+  cerr << "test test" << endl;
+  stats.log_invalid(state);
 
   cout << ans.size() << endl;
   for (const string& bridge : ans) {
     cout << bridge << endl;
   }
-
-  cerr << "2 test err!" << endl;
 
   return 0;
 }
