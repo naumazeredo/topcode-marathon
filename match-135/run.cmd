@@ -14,7 +14,7 @@ echo.
 rmdir /s /q build
 mkdir build
 pushd build
-%CC% /EHsc /Fe"solution" ../solution/main.cpp
+%CC% /EHsc /Fe"solution" ../src/solution/main.cpp
 popd
 
 echo.
