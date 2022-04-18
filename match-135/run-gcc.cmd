@@ -1,4 +1,4 @@
 @echo off
 
 set CC=g++
-run.cmd
+run.cmd %*
