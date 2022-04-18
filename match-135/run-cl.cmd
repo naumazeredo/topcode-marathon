@@ -1,2 +1,4 @@
-@set "CC=cl"
-@tools/run.cmd
+@echo off
+
+set "CC=cl"
+run.cmd
