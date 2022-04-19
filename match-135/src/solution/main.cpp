@@ -1,11 +1,14 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <string>
+#include <chrono>
 
 #include "common/state.h"
 #include "common/stats.h"
 
 using namespace std;
+using namespace std::chrono;
 
 int N, C;
 vector<vector<int>> grid;
@@ -60,7 +63,7 @@ void  build_next_states(
   }
 }
 
-void process_state(State& state) {
+void process_state(State& state, vector<State>& next_states) {
   if (state.row == N) {
     // End of grid
     return;
@@ -68,7 +71,6 @@ void process_state(State& state) {
 
   vector<int> remaining_bridges(N, 0);
   vector<int> next_bridges_from_above(N, 0);
-
   vector<int> next_island(N, 0);
 
   for (int i = 0; i < N; i++) {
@@ -90,21 +92,37 @@ void process_state(State& state) {
     if (next_bridges_from_above[i]) next = -1;
   }
 
-  vector<State> next_states;
   build_next_states(0, state.row, next_bridges_from_above, remaining_bridges, next_states, next_island);
-
-  for (auto state: next_states) {
-    //cerr << state << endl;
-    process_state(state);
-  }
 }
 
+void search_best_solution() {
+  auto start_search_time = high_resolution_clock::now();
+  queue<State> q;
+
+  q.push(State { 0, N });
+
+  while (!q.empty()) {
+    State s = q.front(); q.pop();
+
+    vector<State> next_states;
+
+    process_state(s, next_states);
+
+    for (auto state : next_states) 
+      q.push(state);
+  }
+
+  // Calculate search execution time
+  auto stop = high_resolution_clock::now();
+  cerr << duration_cast<milliseconds>(stop - start_search_time).count() << endl;
+}
 
 int main() {
   Stats stats;
 
   cin >> N >> C;
   grid.assign(N, vector<int>(N, 0));
+  cerr << N << endl;
 
   // Read input
   for (int r = 0; r < N; r++) {
@@ -118,10 +136,9 @@ int main() {
 
   print_grid();
 
-  State state { 0, N };
-  process_state(state);
+  search_best_solution();
 
-  // Send Answer
+  // Send Dummy Answer
   cout << "1" << endl;
   cout << "5 6 6 6 2" << endl;
 

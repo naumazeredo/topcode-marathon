@@ -67,5 +67,6 @@ if "%STATS%" == "1" (
   echo Running single test...
   echo.
 
-  java -jar "./tester.jar" -exec "./build/solution.exe" -seed 1 %TESTER_OPTS%
+  @REM TODO: get params like -N -seed and pass to tester execution
+  java -jar "./tester.jar" -exec "./build/solution.exe" -seed 1 -N 9 %TESTER_OPTS%
 )

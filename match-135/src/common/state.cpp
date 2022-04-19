@@ -22,14 +22,6 @@ std::istream& operator>>(std::istream& in, StateStats& stats) {
   return in;
 }
 
-State::State(int i, int n)
-  : row(i), bridges_from_above(n, 0)
-{}
-
-State::State(int i, std::vector<int> _bridges_from_above)
-  : row(i), bridges_from_above(std::move(_bridges_from_above))
-{}
-
 StateStats State::get_stats() const {
   return StateStats {
     .depth           = row,
@@ -41,12 +33,20 @@ StateStats State::get_stats() const {
   };
 }
 
+State::State(int i, int n)
+  : row(i), bridges_from_above(n, 0)
+{}
+
+State::State(int i, std::vector<int> _bridges_from_above)
+  : row(i), bridges_from_above(std::move(_bridges_from_above))
+{}
+
 std::ostream& operator<<(std::ostream& out, const State& state) {
-  out << state.row << ": ";
+  out << state.row << ": [";
   for(int i: state.bridges_from_above) {
     out << i << ", ";
   }
-  out << std::endl;
+  out << "]" << std::endl;
 
   return out;
 }
