@@ -24,12 +24,12 @@ std::istream& operator>>(std::istream& in, StateStats& stats) {
 
 StateStats State::get_stats() const {
   return StateStats {
-    .depth           = row,
-    .branching       = 0,
-    .closed_score    = 0,
-    .open_score      = 0,
-    .component_size  = 0,
-    .component_count = 0
+    /*.depth           =*/ row,
+    /*.branching       =*/ 0,
+    /*.closed_score    =*/ 0,
+    /*.open_score      =*/ 0,
+    /*.component_size  =*/ 0,
+    /*.component_count =*/ 0
   };
 }
 
