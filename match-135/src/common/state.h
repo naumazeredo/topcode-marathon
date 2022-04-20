@@ -24,7 +24,11 @@ struct State {
   State(const State& state) = default;
   State(State&& state) = default;
 
+  State& operator=(const State&) = default;
+  State& operator=(State&&) = default;
+
   StateStats get_stats() const;
 
   friend std::ostream& operator<<(std::ostream& out, const State& state);
+  bool operator<(const State& s) const;
 };

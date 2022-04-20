@@ -68,5 +68,5 @@ if "%STATS%" == "1" (
   echo.
 
   @REM TODO: get params like -N -seed and pass to tester execution
-  java -jar "./tester.jar" -exec "./build/solution.exe" -seed 1 -N 9 %TESTER_OPTS%
+  java -jar "./tester.jar" -exec "./build/solution.exe" -seed 1 %TESTER_OPTS%
 )

@@ -50,3 +50,7 @@ std::ostream& operator<<(std::ostream& out, const State& state) {
 
   return out;
 }
+
+bool State::operator<(const State& s) const {
+  return row < s.row;
+}

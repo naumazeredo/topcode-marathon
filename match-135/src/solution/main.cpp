@@ -97,19 +97,19 @@ void process_state(State& state, vector<State>& next_states) {
 
 void search_best_solution() {
   auto start_search_time = high_resolution_clock::now();
-  queue<State> q;
+  priority_queue<State> pq;
 
-  q.push(State { 0, N });
+  pq.push(State{ 0, N });
 
-  while (!q.empty()) {
-    State s = q.front(); q.pop();
+  while (!pq.empty()) {
+    State s = pq.top(); pq.pop();
 
     vector<State> next_states;
 
     process_state(s, next_states);
 
     for (auto state : next_states) 
-      q.push(state);
+      pq.push(state);
   }
 
   // Calculate search execution time
