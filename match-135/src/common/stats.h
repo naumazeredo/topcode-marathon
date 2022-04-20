@@ -2,55 +2,85 @@
 #include <iostream>
 #include "common/state.h"
 
-#ifdef STATS
-#define ENABLE(x) x
-#else
-#define ENABLE(x)
-#endif
-
 const int PRINT_TIME_IN_MS = 1'000;
 const int MAX_PROGRAM_TIME_IN_MS = 9'500;
+
+struct VarStat {
+  int min = 0;
+  int max = 0;
+  int sum = 0;
+
+  void process(int value) {
+    min = std::min(min, value);
+    max = std::max(max, value);
+    sum += value;
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const VarStat& stat) {
+    out << stat.min << "/" << stat.max << "/" << stat.sum;
+    return out;
+  }
+};
+
+struct CaseStats {
+  int     state_count = 0;
+  VarStat depth;
+  VarStat branching;
+  VarStat closed_score;
+  VarStat open_score;
+  VarStat component_size;
+  VarStat component_count;
+
+  void add_state(const State& state) {
+    StateStats stats = state.get_stats();
+
+    state_count += 1;
+    depth.process(stats.depth);
+    branching.process(stats.branching);
+    closed_score.process(stats.closed_score);
+    open_score.process(stats.open_score);
+    component_size.process(stats.component_size);
+    component_count.process(stats.component_count);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const CaseStats& stats) {
+    out <<
+      "========= Stats ========="                   << "\n" <<
+      "State count     : " << stats.state_count     << "\n" <<
+      "Depth           : " << stats.depth           << "\n" <<
+      "Branching       : " << stats.branching       << "\n" <<
+      "Closed Score    : " << stats.closed_score    << "\n" <<
+      "Open Score      : " << stats.open_score      << "\n" <<
+      "Component Size  : " << stats.component_size  << "\n" <<
+      "Component Count : " << stats.component_count << "\n" <<
+      "=========================";
+
+    return out;
+  }
+};
 
 struct Stats {
   std::chrono::high_resolution_clock::time_point program_start_time;
   std::chrono::high_resolution_clock::time_point last_print_time;
+  CaseStats case_stats;
 
   Stats() {
     program_start_time = std::chrono::high_resolution_clock::now();
     last_print_time = program_start_time;
-
-    ENABLE(
-      std::cerr << "@0\n";
-    )
   }
 
   ~Stats() {
-    ENABLE(
-      std::cerr << "@1\n";
-    )
-
     auto now = std::chrono::high_resolution_clock::now();
     std::cerr <<
-      "Submitting best result... " <<
+      "Submitting ... " <<
       std::chrono::duration_cast<std::chrono::milliseconds>(now - program_start_time).count() / 1000.0 <<
-      " s" <<
-      std::endl;
+      "s\n\n";
+
+    std::cerr << case_stats << "\n\n";
   }
 
-  void log(const State& state) const {
-    ENABLE(
-      std::cerr << "@S ";
-      std::cerr << state.get_stats();
-      std::cerr << "\n";
-    )
-  }
-
-  void log_invalid(const State& state) const {
-    ENABLE(
-      std::cerr << "@I ";
-      std::cerr << state.get_stats();
-      std::cerr << "\n";
-    )
+  void add_state(const State& state) {
+    case_stats.add_state(state);
   }
 
   bool should_end_search() {
