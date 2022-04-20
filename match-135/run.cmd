@@ -19,7 +19,7 @@ for %%O in (%*) do (
     set GCC_OPTS=-O2
   )
 
-  if "!PREV!" == "-N" (
+  if "!PREV!" == "N" (
     set TESTER_OPTS=%TESTER_OPTS% -N %%O
   )
 
