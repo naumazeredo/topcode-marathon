@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include "common/state.h"
+#include "common/stats.h"
 
 struct VarStat {
   int min = 0;

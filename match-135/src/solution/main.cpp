@@ -23,7 +23,7 @@ void print_grid() {
   }
 };
 
-void  build_next_states_backtracking(
+void build_next_states_backtracking(
   int col,
   State& current_state,
   vector<int>& next_bridges_from_above, // construindo
@@ -108,25 +108,24 @@ vector<State> build_next_states(State& state) {
   return next_states;
 }
 
-void search_best_solution() {
-  auto start_search_time = high_resolution_clock::now();
+void search_best_solution(Stats& stats) {
   priority_queue<State> pq;
-
   pq.push(State{ 0, N , nullptr});
 
   while (!pq.empty()) {
-    State s = pq.top(); pq.pop();
-    if (s.row >= 3) continue;
+    State s = pq.top();
+    pq.pop();
+
+    stats.add_state(s);
 
     vector<State> next_states = build_next_states(s);
 
-    for (auto state : next_states) 
+    if (stats.should_end_search())
+      return;
+
+    for (auto state : next_states)
       pq.push(state);
   }
-
-  // Calculate search execution time
-  auto stop = high_resolution_clock::now();
-  cerr << duration_cast<milliseconds>(stop - start_search_time).count() << endl;
 }
 
 int main() {
@@ -148,7 +147,7 @@ int main() {
 
   print_grid();
 
-  search_best_solution();
+  search_best_solution(stats);
 
   // Send Dummy Answer
   cout << "1" << endl;

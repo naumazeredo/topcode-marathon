@@ -3,18 +3,6 @@
 #include <iostream>
 #include <vector>
 
-struct StateStats {
-  int depth;
-  int branching;
-  int closed_score;
-  int open_score;
-  int component_size;
-  int component_count;
-
-  friend std::ostream& operator<<(std::ostream& out, const StateStats& stats);
-  friend std::istream& operator>>(std::istream& in, StateStats& stats);
-};
-
 struct State {
   int row;
   State* parent_state;
@@ -27,8 +15,6 @@ struct State {
 
   State& operator=(const State&) = default;
   State& operator=(State&&) = default;
-
-  StateStats get_stats() const;
 
   friend std::ostream& operator<<(std::ostream& out, const State& state);
   bool operator<(const State& s) const;
