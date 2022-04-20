@@ -25,43 +25,66 @@ void print_grid() {
 
 void  build_next_states_backtracking(
   int col,
-  int current_row,
-  vector<int>& next_bridges_from_above,
-  vector<int>& remaining_bridges,
+  State& current_state,
+  vector<int>& next_bridges_from_above, // construindo
   vector<State>& next_states,
-  vector<int>& next_island,
-  State* parent_state) {
+  vector<int>& next_island) {
   if (col >= N) {
-    next_states.push_back(State { current_row + 1, next_bridges_from_above, parent_state});
+    next_states.push_back(State { current_state.row + 1, next_bridges_from_above, &current_state});
     return;
   }
 
-  int degree = remaining_bridges[col];
+  int island_degree = grid[current_state.row][col];
+  int incoming_bridges = current_state.bridges_from_above[col];
 
-  // No bridge remaining in the island
-  if (degree == 0) {
-    build_next_states_backtracking(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island, parent_state);
+  // Nao tem ilha, passa tudo pra frente
+  if (island_degree == 0) {
+    next_bridges_from_above[col] = incoming_bridges;
+    build_next_states_backtracking(col + 1, current_state, next_bridges_from_above, next_states, next_island);
     return;
   }
 
-  // Isolated island that doesn't connect to any component
-  if (remaining_bridges[col] == grid[current_row][col]) {
-    build_next_states_backtracking(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island, parent_state);
+  // Tem ilha
+  if (island_degree < incoming_bridges) {
+    // Caso inválido
+    return;
   }
 
-  int next = next_island[col];
-  int next_degree = (next == -1)? 0: grid[current_row][next_island[col]];
+  if (incoming_bridges == 0) {
+    // Ilha não adicionada a nehuma componente
+    build_next_states_backtracking(col + 1, current_state, next_bridges_from_above, next_states, next_island);
+  }
 
-  // Island will connect to others
-  for (int i = 0; i <= degree and i <= next_degree; i++) {
-    next_bridges_from_above[col] = degree - i;
-    if (next != -1) remaining_bridges[next] -= i;
+  int remaining_degree = island_degree - incoming_bridges;
 
-    build_next_states_backtracking(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island, parent_state);
+  int col_next_island = next_island[col];
+
+  int max_bridges_to_right;
+  if (col_next_island != -1) max_bridges_to_right = min(min(C, grid[current_state.row][col_next_island]), remaining_degree);
+  else max_bridges_to_right = 0;
+
+  // Adicionando ilha à componente de cima ou criando uma nova
+  // Todas as conexões são pra baixo
+  if (remaining_degree <= C) {
+    next_bridges_from_above[col] = min(remaining_degree, C);
+    build_next_states_backtracking(col + 1, current_state, next_bridges_from_above, next_states, next_island);
+    next_bridges_from_above[col] = 0;
+  }
+
+  // Adicionando ilha da direita à componente atual
+  for (int i = 1; i <= max_bridges_to_right; i++) {
+
+    // Criando i pontes para lado e (remaining_degree - i) pontes para baixo
+    next_bridges_from_above[col] = remaining_degree - i;
+    current_state.bridges_from_above[col_next_island] += i;
+
+    build_next_states_backtracking(col + 1, current_state, next_bridges_from_above, next_states, next_island);
 
     next_bridges_from_above[col] = 0;
-    if (next != -1) remaining_bridges[next] += i;
+    current_state.bridges_from_above[col_next_island] -= i;
+
   }
+  // Removendo ilha da direita da componente atual
 }
 
 vector<State> build_next_states(State& state) {
@@ -71,30 +94,17 @@ vector<State> build_next_states(State& state) {
     return next_states;
   }
 
-  vector<int> remaining_bridges(N, 0);
-  vector<int> next_bridges_from_above(N, 0);
   vector<int> next_island(N, 0);
 
-  for (int i = 0; i < N; i++) {
-    // if (!validate_state(state)) return;
+  for (int i = N-1, index = -1; i >= 0; i--) {
+    next_island[i] = index;
 
-    if (grid[state.row][i] == 0) {
-      next_bridges_from_above[i] = state.bridges_from_above[i];
-      continue;
-    }
-
-    if (grid[state.row][i] < state.bridges_from_above[i]) return next_states; // Invalid state
-    remaining_bridges[i] = grid[state.row][i] - state.bridges_from_above[i];
+    if (state.bridges_from_above[i]) index = -1;
+    if (grid[state.row][i]) index = i;
   }
 
-  for(int i = N, next = -1; i >= 0; i--) {
-    next_island[i] = next;
-
-    if (remaining_bridges[i]) next = i;
-    if (next_bridges_from_above[i]) next = -1;
-  }
-
-  build_next_states_backtracking(0, state.row, next_bridges_from_above, remaining_bridges, next_states, next_island, &state);
+  vector<int> next_bridges_from_above(N, 0);
+  build_next_states_backtracking(0, state, next_bridges_from_above, next_states, next_island);
   return next_states;
 }
 
@@ -106,6 +116,7 @@ void search_best_solution() {
 
   while (!pq.empty()) {
     State s = pq.top(); pq.pop();
+    if (s.row >= 3) continue;
 
     vector<State> next_states = build_next_states(s);
 
