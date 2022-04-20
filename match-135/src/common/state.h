@@ -17,10 +17,11 @@ struct StateStats {
 
 struct State {
   int row;
+  State* parent_state;
   std::vector<int> bridges_from_above;
 
-  State(int i, int n);
-  State(int i, std::vector<int> _bridges_from_above);
+  State(int i, int n, State* parent_state);
+  State(int i, std::vector<int> _bridges_from_above, State* parent_state);
   State(const State& state) = default;
   State(State&& state) = default;
 

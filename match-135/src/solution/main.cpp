@@ -12,6 +12,7 @@ using namespace std::chrono;
 
 int N, C;
 vector<vector<int>> grid;
+deque<State> allStates;
 
 void print_grid() {
   for (auto row : grid) {
@@ -22,16 +23,16 @@ void print_grid() {
   }
 };
 
-void  build_next_states(
+void  build_next_states_backtracking(
   int col,
   int current_row,
   vector<int>& next_bridges_from_above,
   vector<int>& remaining_bridges,
   vector<State>& next_states,
-  vector<int>& next_island
-) {
+  vector<int>& next_island,
+  State* parent_state) {
   if (col >= N) {
-    next_states.push_back(State { current_row + 1, next_bridges_from_above });
+    next_states.push_back(State { current_row + 1, next_bridges_from_above, parent_state});
     return;
   }
 
@@ -39,13 +40,13 @@ void  build_next_states(
 
   // No bridge remaining in the island
   if (degree == 0) {
-    build_next_states(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island);
+    build_next_states_backtracking(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island, parent_state);
     return;
   }
 
   // Isolated island that doesn't connect to any component
   if (remaining_bridges[col] == grid[current_row][col]) {
-    build_next_states(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island);
+    build_next_states_backtracking(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island, parent_state);
   }
 
   int next = next_island[col];
@@ -56,17 +57,18 @@ void  build_next_states(
     next_bridges_from_above[col] = degree - i;
     if (next != -1) remaining_bridges[next] -= i;
 
-    build_next_states(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island);
+    build_next_states_backtracking(col + 1, current_row, next_bridges_from_above, remaining_bridges, next_states, next_island, parent_state);
 
     next_bridges_from_above[col] = 0;
     if (next != -1) remaining_bridges[next] += i;
   }
 }
 
-void process_state(State& state, vector<State>& next_states) {
+vector<State> build_next_states(State& state) {
+  vector<State> next_states;
   if (state.row == N) {
     // End of grid
-    return;
+    return next_states;
   }
 
   vector<int> remaining_bridges(N, 0);
@@ -81,7 +83,7 @@ void process_state(State& state, vector<State>& next_states) {
       continue;
     }
 
-    if (grid[state.row][i] < state.bridges_from_above[i]) return; // Invalid state
+    if (grid[state.row][i] < state.bridges_from_above[i]) return next_states; // Invalid state
     remaining_bridges[i] = grid[state.row][i] - state.bridges_from_above[i];
   }
 
@@ -92,21 +94,20 @@ void process_state(State& state, vector<State>& next_states) {
     if (next_bridges_from_above[i]) next = -1;
   }
 
-  build_next_states(0, state.row, next_bridges_from_above, remaining_bridges, next_states, next_island);
+  build_next_states_backtracking(0, state.row, next_bridges_from_above, remaining_bridges, next_states, next_island, &state);
+  return next_states;
 }
 
 void search_best_solution() {
   auto start_search_time = high_resolution_clock::now();
   priority_queue<State> pq;
 
-  pq.push(State{ 0, N });
+  pq.push(State{ 0, N , nullptr});
 
   while (!pq.empty()) {
     State s = pq.top(); pq.pop();
 
-    vector<State> next_states;
-
-    process_state(s, next_states);
+    vector<State> next_states = build_next_states(s);
 
     for (auto state : next_states) 
       pq.push(state);

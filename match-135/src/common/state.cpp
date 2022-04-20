@@ -33,12 +33,12 @@ StateStats State::get_stats() const {
   };
 }
 
-State::State(int i, int n)
-  : row(i), bridges_from_above(n, 0)
+State::State(int i, int n, State* parent_state)
+  : row(i), bridges_from_above(n, 0), parent_state(parent_state)
 {}
 
-State::State(int i, std::vector<int> _bridges_from_above)
-  : row(i), bridges_from_above(std::move(_bridges_from_above))
+State::State(int i, std::vector<int> _bridges_from_above, State* parentState)
+  : row(i), bridges_from_above(std::move(_bridges_from_above)), parent_state(parent_state)
 {}
 
 std::ostream& operator<<(std::ostream& out, const State& state) {
