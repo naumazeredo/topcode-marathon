@@ -1,8 +1,9 @@
+#include <chrono>
+#include <iomanip>
 #include <iostream>
-#include <vector>
 #include <queue>
 #include <string>
-#include <chrono>
+#include <vector>
 
 #include "common/state.h"
 #include "common/stats.h"
@@ -133,7 +134,9 @@ int main() {
 
   cin >> N >> C;
   grid.assign(N, vector<int>(N, 0));
-  cerr << N << endl;
+
+  cerr << setprecision(3) << fixed;
+  cerr << N << " " << C << endl;
 
   // Read input
   for (int r = 0; r < N; r++) {

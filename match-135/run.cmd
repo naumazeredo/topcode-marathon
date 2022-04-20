@@ -1,9 +1,9 @@
 setlocal enabledelayedexpansion
-@echo off
+REM @echo off
 
 set TESTER_OPTS=-novis
-set PREV=1
 
+set PREV=1
 for %%O in (%*) do (
   if "%%O" == "stats" (
     set STATS=1
@@ -12,6 +12,11 @@ for %%O in (%*) do (
 
   if "%%O" == "vis" (
     set TESTER_OPTS=
+  )
+
+  if "%%O" == "ship" (
+    set CL_OPTS=/O2
+    set GCC_OPTS=-O2
   )
 
   if "!PREV!" == "-N" (
@@ -45,14 +50,14 @@ echo Building...
 echo.
 
 if "%CC%" == "cl" (
-  %CC% %OPTS% /std:c++17 /Za /EHsc /I../%INCLUDE_DIR% /Fe"./%SOLUTION_EXE%" ../%SOLUTION_DIR%/*.cpp ../%COMMON_DIR%/*.cpp
+  %CC% %CL_OPTS% /std:c++17 /Za /EHsc /I../%INCLUDE_DIR% /Fe"./%SOLUTION_EXE%" ../%SOLUTION_DIR%/*.cpp ../%COMMON_DIR%/*.cpp /link /DEBUG
   if "%STATS%" == "1" (
-    %CC% %OPTS% /std:c++17 /Za /EHsc /I../%INCLUDE_DIR% /Fe"./%STATS_EXE%" ../%TOOLS_DIR%/stats.cpp ../%COMMON_DIR%/*.cpp
+    %CC% %CL_OPTS% /std:c++17 /Za /EHsc /I../%INCLUDE_DIR% /Fe"./%STATS_EXE%" ../%TOOLS_DIR%/stats.cpp ../%COMMON_DIR%/*.cpp /link /DEBUG
   )
 ) else if "%CC%" == "g++" (
-  %CC% %OPTS% -std=c++17 -I../%INCLUDE_DIR% -o "./%SOLUTION_EXE%" ../%SOLUTION_DIR%/*.cpp ../%COMMON_DIR%/*.cpp
+  %CC% %GCC_OPTS% -std=c++17 -I../%INCLUDE_DIR% -o "./%SOLUTION_EXE%" ../%SOLUTION_DIR%/*.cpp ../%COMMON_DIR%/*.cpp
   if "%STATS%" == "1" (
-    %CC% %OPTS% -std=c++17 -I../%INCLUDE_DIR% -o"./%STATS_EXE%" ../%TOOLS_DIR%/stats.cpp ../%COMMON_DIR%/*.cpp
+    %CC% %GCC_OPTS% -std=c++17 -I../%INCLUDE_DIR% -o"./%STATS_EXE%" ../%TOOLS_DIR%/stats.cpp ../%COMMON_DIR%/*.cpp
   )
 ) else (
   echo CC not cl or gcc

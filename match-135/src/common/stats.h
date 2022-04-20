@@ -2,7 +2,7 @@
 #include <iostream>
 
 static const int PRINT_TIME_IN_MS = 500;
-static const int MAX_PROGRAM_TIME_IN_MS = 9'500;
+static const int MAX_PROGRAM_TIME_IN_MS = 9'750;
 
 struct State;
 
