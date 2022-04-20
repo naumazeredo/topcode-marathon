@@ -103,7 +103,10 @@ void search_best_solution(Stats& stats) {
   pq.push(State{ 0, N , nullptr});
 
   while (!pq.empty()) {
-    State s = pq.top(); pq.pop();
+    State s = pq.top();
+    pq.pop();
+
+    stats.add_state(s);
 
     vector<State> next_states = build_next_states(s);
 

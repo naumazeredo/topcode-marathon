@@ -46,10 +46,14 @@ echo.
 
 if "%CC%" == "cl" (
   %CC% %OPTS% /std:c++17 /Za /EHsc /I../%INCLUDE_DIR% /Fe"./%SOLUTION_EXE%" ../%SOLUTION_DIR%/*.cpp ../%COMMON_DIR%/*.cpp
-  %CC% %OPTS% /std:c++17 /Za /EHsc /I../%INCLUDE_DIR% /Fe"./%STATS_EXE%" ../%TOOLS_DIR%/stats.cpp ../%COMMON_DIR%/*.cpp
+  if "%STATS%" == "1" (
+    %CC% %OPTS% /std:c++17 /Za /EHsc /I../%INCLUDE_DIR% /Fe"./%STATS_EXE%" ../%TOOLS_DIR%/stats.cpp ../%COMMON_DIR%/*.cpp
+  )
 ) else if "%CC%" == "g++" (
   %CC% %OPTS% -std=c++17 -I../%INCLUDE_DIR% -o "./%SOLUTION_EXE%" ../%SOLUTION_DIR%/*.cpp ../%COMMON_DIR%/*.cpp
-  %CC% %OPTS% -std=c++17 -I../%INCLUDE_DIR% -o"./%STATS_EXE%" ../%TOOLS_DIR%/stats.cpp ../%COMMON_DIR%/*.cpp
+  if "%STATS%" == "1" (
+    %CC% %OPTS% -std=c++17 -I../%INCLUDE_DIR% -o"./%STATS_EXE%" ../%TOOLS_DIR%/stats.cpp ../%COMMON_DIR%/*.cpp
+  )
 ) else (
   echo CC not cl or gcc
   exit 1
